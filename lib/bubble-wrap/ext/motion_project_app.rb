@@ -11,8 +11,14 @@ module BubbleWrap
               app.frameworks = ::BubbleWrap::Requirement.frameworks(app.frameworks)
               block.call(app) unless block.nil?
             end
-            configs.each_value &bw_config
-            config.validate
+            begin
+              config.setup_blocks << bw_config
+            rescue
+              NSLog "BW: It seems like you're running an older RubyMotion version than 1.24.
+              Please run `sudo motion update` to remove this warning."
+              configs.each_value &bw_config
+              config.validate
+            end
           end
           alias :setup_without_bubblewrap :setup
           alias :setup :setup_with_bubblewrap
